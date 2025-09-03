@@ -1,4 +1,9 @@
+// import initModel from './appStates/model.js'
+// import initView from './appStates/view.js'
+import bindController from './appStates/controller.js'
+
 export default () => {
+  // view logic (plug)
   const mainEl = document.querySelector('.main')
   const mainContainer = document.createElement('div')
   mainContainer.classList.add('.container')
@@ -15,4 +20,12 @@ export default () => {
   formEl.append(inputEl, resetBtn)
   mainContainer.append(formEl)
   mainEl.append(mainContainer)
+
+  // const state = initModel()
+  // const watchedState = initView(state)
+  const watchedState = {
+    // plug
+    plug: 'plug',
+  }
+  bindController(watchedState)
 }
