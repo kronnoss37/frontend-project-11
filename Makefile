@@ -10,4 +10,8 @@ publish:
 lint:
 	npx eslint .
 
+#	Target: run app in browser
+run:
+	npm run dev
+
 # Build
