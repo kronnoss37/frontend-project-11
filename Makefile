@@ -14,4 +14,6 @@ lint:
 run:
 	npm run dev
 
-# Build
+# Target: build project
+build:
+	npm run build
