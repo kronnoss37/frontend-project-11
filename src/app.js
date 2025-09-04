@@ -1,6 +1,8 @@
 // import initModel from './appStates/model.js'
 // import initView from './appStates/view.js'
 import bindController from './appStates/controller.js'
+import i18next from 'i18next'
+import resourses from './locales/index.js'
 
 export default () => {
   // view logic (plug)
@@ -20,6 +22,16 @@ export default () => {
   formEl.append(inputEl, resetBtn)
   mainContainer.append(formEl)
   mainEl.append(mainContainer)
+
+  const i18n = i18next.createInstance()
+  i18n.init({
+    lng: 'ru',
+    resourses,
+  })
+    .then(() => {
+      // use i18n
+    })
+    .catch()
 
   // const state = initModel()
   // const watchedState = initView(state)
