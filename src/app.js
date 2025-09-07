@@ -1,43 +1,36 @@
-// import initModel from './appStates/model.js'
-// import initView from './appStates/view.js'
+import initModel from './appStates/model.js'
+import initView from './appStates/view.js'
 import bindController from './appStates/controller.js'
 import i18next from 'i18next'
-import resourses from './locales/index.js'
+import resources from './locales/index.js'
 
 export default () => {
-  // view logic (plug)
-  const mainEl = document.querySelector('.main')
-  const mainContainer = document.createElement('div')
-  mainContainer.classList.add('.container')
+  const elements = {
+    formElement: document.querySelector('#rss-form'),
+    inputElement: document.querySelector('#url-input'),
+    feedbackElement: document.querySelector('#feedback'),
+    textFields: {
+      title: document.querySelector('#rss-title'),
+      description: document.querySelector('#rss-description'),
+      example: document.querySelector('#rss-example'),
+      submitButton: document.querySelector('#rss-submit'),
+      label: document.querySelector('label[for="url-input"]'),
+    },
+  }
 
-  const formEl = document.createElement('form')
-  const inputEl = document.createElement('input')
-  inputEl.type = 'text'
-  inputEl.placeholder = 'Ссылка RSS'
-
-  const resetBtn = document.createElement('button')
-  resetBtn.type = 'reset'
-  resetBtn.classList.add('btn', 'btn-primary')
-  resetBtn.textContent = 'Добавить'
-  formEl.append(inputEl, resetBtn)
-  mainContainer.append(formEl)
-  mainEl.append(mainContainer)
+  const state = initModel()
+  const defaultLanguage = 'ru'
 
   const i18n = i18next.createInstance()
-  i18n.init({
-    lng: 'ru',
-    resourses,
-  })
+  i18n
+    .init({
+      lng: defaultLanguage,
+      resources,
+    })
     .then(() => {
       // use i18n
+      const watchedState = initView(state, i18n, elements)
+      bindController(watchedState, elements)
     })
     .catch()
-
-  // const state = initModel()
-  // const watchedState = initView(state)
-  const watchedState = {
-    // plug
-    plug: 'plug',
-  }
-  bindController(watchedState)
 }
