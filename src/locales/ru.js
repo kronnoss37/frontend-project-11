@@ -1,18 +1,22 @@
 export default {
   translation: {
-    app: {
+    appItems: {
       title: 'RSS агрегатор',
-      subtitle: 'Начните читать RSS сегодня! Это легко, это красиво.',
-      formPlaceholder: 'Ссылка RSS',
+      description: 'Начните читать RSS сегодня! Это легко, это красиво.',
+      label: 'Ссылка RSS',
       submitButton: 'Добавить',
-      exampleRSS: 'Пример: https://lorem-rss.hexlet.app/feed',
+      example: 'Пример: https://lorem-rss.hexlet.app/feed',
     },
     errors: {
       validation: {
         required: 'Данное поле являестя обязательным...',
-        duplicated: 'Введенный RSS-адрес уже существует',
-        incorrecredUrl: 'Введенный RSS-адрес должен быть валидным Url',
+        duplicated: 'Введенный RSS-адрес уже существует...',
+        incorrecredUrl: 'Введенный RSS-адрес должен быть валидным Url...',
       },
+    },
+    processStates: {
+      success: 'RSS успешно загружен',
+      fail: 'Ресурс не содержит валидный RSS',
     },
   },
 }
