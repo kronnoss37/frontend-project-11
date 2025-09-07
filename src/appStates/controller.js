@@ -1,7 +1,5 @@
 import * as yup from 'yup'
 
-// setLocale (без вызова i18n.t()a)
-
 yup.setLocale({
   mixed: {
     required: () => 'errors.validation.required',
@@ -12,28 +10,29 @@ yup.setLocale({
   },
 })
 
-const validateUrl = (currentUrl, feeds) => {
-  const schema = yup.object().shape({
-    // url??
-    url: yup.string().required().url().notOneOf(feeds),
+const initSchema = feeds => yup.object().shape({
+  url: yup.string().required().url().notOneOf(feeds),
+})
+
+export default (watchedState, elements) => {
+  const { formElement, inputElement } = elements
+  inputElement.focus() // autofocus??
+
+  formElement.addEventListener('submit', (event) => {
+    event.preventDefault()
+    const { feeds } = watchedState.form
+    const formData = new FormData(formElement)
+    const newUrl = Object.fromEntries(formData)
+
+    const schema = initSchema(feeds)
+    schema
+      .validate(newUrl)
+      .then(() => {
+        watchedState.form.error = ''
+        feeds.push(newUrl.url)
+      })
+      .catch((error) => {
+        watchedState.form.error = error.message
+      })
   })
-
-  schema
-    .validate(currentUrl)
-    .then((data) => {
-      console.log('valid url', data.url)
-    })
-    .catch((error) => {
-      // console.log('error', error)
-      console.log('message', error.message)
-    })
-}
-
-export default (watchedState) => {
-  console.log(watchedState)
-  const urlValue = {
-    url: 'invalid-url',
-  }
-  const feeds = ['invalid-url', 'https://www.google.com/', '']
-  validateUrl(urlValue, feeds)
 }
