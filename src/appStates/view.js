@@ -8,39 +8,60 @@ const fillTextFields = (i18n, fields) => {
   })
 }
 
-const handleErrors = (elements, error, i18n) => {
-  const { inputElement, feedbackElement } = elements
+const handleFeedback = (elements, path, i18n) => {
+  const { feedbackElement } = elements
+  feedbackElement.textContent = i18n.t(path)
+}
 
-  if (!error) {
-    inputElement.classList.remove('is-invalid')
-    feedbackElement.classList.remove('text-danger')
-    feedbackElement.classList.add('text-success') // ??
-    feedbackElement.textContent = ''
-  }
-  else {
-    inputElement.classList.add('is-invalid')
-    feedbackElement.classList.add('text-danger')
-    feedbackElement.classList.remove('text-success') // ??
-    feedbackElement.textContent = i18n.t(error)
+const handleFailState = (elements) => {
+  const { inputElement, feedbackElement } = elements
+  inputElement.classList.add('is-invalid')
+  feedbackElement.classList.add('text-danger')
+  feedbackElement.classList.remove('text-success')
+}
+
+const handleSuccessState = (elements) => {
+  const { inputElement, feedbackElement } = elements
+  inputElement.classList.remove('is-invalid')
+  feedbackElement.classList.remove('text-danger')
+  feedbackElement.classList.add('text-success')
+}
+
+const handleProcessStatus = (i18n, elements, value) => {
+  const { textFields, formElement, inputElement } = elements
+  const { submitButton } = textFields
+  switch (value) {
+    case 'default':
+      fillTextFields(i18n, textFields)
+      break
+    case 'sending':
+      submitButton.disabled = true // ??
+      break
+    case 'fail':
+      submitButton.disabled = false
+      handleFailState(elements)
+      break
+    case 'success':
+      submitButton.disabled = false
+      formElement.reset()
+      inputElement.focus()
+      handleSuccessState(elements)
+      break
+    default:
+      break
   }
 }
 
 export default (state, i18n, elements) => {
   //
-  const { textFields } = elements
-  fillTextFields(i18n, textFields)
-
   const watchedState = onChange(state, (path, value) => {
-    console.log(path)
-    console.log(value)
-
     switch (path) {
-      case 'process.status':
+      case 'processStatus':
+        handleProcessStatus(i18n, elements, value)
         console.log('status', value)
         break
-      case 'form.error':
-        console.log('error', value)
-        handleErrors(elements, value, i18n)
+      case 'feedback':
+        handleFeedback(elements, value, i18n)
         break
       default:
         break
@@ -48,5 +69,3 @@ export default (state, i18n, elements) => {
   })
   return watchedState
 }
-
-export { fillTextFields }
