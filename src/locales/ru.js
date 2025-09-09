@@ -7,16 +7,17 @@ export default {
       submitButton: 'Добавить',
       example: 'Пример: https://lorem-rss.hexlet.app/feed',
     },
-    errors: {
+    feedback: {
       validation: {
         required: 'Данное поле являестя обязательным...',
         duplicated: 'Введенный RSS-адрес уже существует...',
         incorrecredUrl: 'Введенный RSS-адрес должен быть валидным Url...',
       },
-    },
-    processStates: {
-      success: 'RSS успешно загружен',
-      fail: 'Ресурс не содержит валидный RSS',
+      processStates: {
+        success: 'RSS успешно загружен!',
+        fail: 'Ресурс не содержит валидный RSS...',
+      },
+      network: 'Ошибка сети. Пожалуйста, проверьте соединение...',
     },
   },
 }
