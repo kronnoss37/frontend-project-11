@@ -4,13 +4,13 @@ export default () => {
   // ?? something else?
   return {
     form: {
+      urls: [],
+    },
+    fields: {
       feeds: [],
-      error: null,
+      posts: [],
     },
-    process: {
-      status: 'default', // default, fail, success //??
-      // valid: '',
-      state: '',
-    },
+    processStatus: '', // 'default', 'sending', 'fail', 'success'
+    feedback: null,
   }
 }
