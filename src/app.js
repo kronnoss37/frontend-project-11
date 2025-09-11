@@ -9,6 +9,8 @@ export default () => {
     formElement: document.querySelector('#rss-form'),
     inputElement: document.querySelector('#url-input'),
     feedbackElement: document.querySelector('#feedback'),
+    feedsElement: document.querySelector('#feeds'),
+    postsElement: document.querySelector('#posts'),
     textFields: {
       title: document.querySelector('#rss-title'),
       description: document.querySelector('#rss-description'),
