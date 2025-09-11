@@ -8,7 +8,6 @@
     <title>RSS Aggregator</title>
   </head>
   <body class="d-flex flex-column min-vh-100">
-    <!-- <div id="app"></div> -->
     <div class="modal"></div>
     <main class="main flex-grow-1">
       <section class="container-fluid p-5 bg-dark">
@@ -30,12 +29,18 @@
               </div>
             </form>
             <p id="rss-example" class="text-secondary mb-0 mt-2"></p>
-            <p id="feedback" class="feedback m-0 position-absolute small text-danger"></p>
-            <!-- <div>Error</div> -->
+            <p id="feedback" class="feedback m-0 position-absolute small"></p>
           </div>
         </div>
       </section>
-      <section></section>
+      <section class="container-fluid container-xxl p-5">
+        <div class="row">
+          <div id="posts" class="col-md-12 col-lg-8 mx-auto order-1">
+          </div>
+          <div id="feeds" class="col-md-12 col-lg-4 mx-auto order-0 order-lg-1">
+          </div>
+        </div>
+      </section>
     </main>
     <script type="module" src="./index.js"></script>
   </body>
