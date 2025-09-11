@@ -7,6 +7,15 @@ export default {
       submitButton: 'Добавить',
       example: 'Пример: https://lorem-rss.hexlet.app/feed',
     },
+    fields: {
+      feeds: {
+        title: 'Фиды',
+      },
+      posts: {
+        title: 'Посты',
+        button: 'Просмотр',
+      },
+    },
     feedback: {
       validation: {
         required: 'Данное поле являестя обязательным...',
