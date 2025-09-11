@@ -48,6 +48,7 @@ const parseXMLString = (str) => {
 
   const posts = doc.querySelectorAll('item')
   data.posts = [...posts].map(post => ({
+    id: uniqueId(),
     feedId,
     title: post.querySelector('title').textContent,
     description: post.querySelector('description').textContent,
@@ -64,7 +65,7 @@ export default (watchedState, elements) => {
     event.preventDefault()
     const { urls } = watchedState.form
     const formData = new FormData(formElement)
-    const newUrl = Object.fromEntries(formData)
+    const newUrl = { url: formData.get('url').trim() }
 
     const schema = initSchema(urls)
     schema
@@ -83,8 +84,7 @@ export default (watchedState, elements) => {
         watchedState.feedback = feedbackInners.success
         urls.push(newUrl.url)
         watchedState.fields.feeds.push(parsingData.feed)
-        watchedState.fields.posts = [...watchedState.fields.posts, ...parsingData.posts] // корректно ли??
-        console.log('watchedState.fields', watchedState.fields)
+        watchedState.fields.posts = [...parsingData.posts, ...watchedState.fields.posts] // корректно ли??
       })
       .catch((error) => {
         watchedState.feedback = error.message === 'Network Error' ? feedbackInners.network : error.message
