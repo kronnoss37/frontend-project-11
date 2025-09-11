@@ -10,6 +10,7 @@ export default () => {
       feeds: [],
       posts: [],
     },
+    visitedPost: null,
     processStatus: '', // 'default', 'sending', 'fail', 'success'
     feedback: null,
   }
