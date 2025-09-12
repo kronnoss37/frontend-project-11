@@ -5,10 +5,9 @@ import uniqueId from 'lodash.uniqueid'
 const feedbackInners = {
   required: 'feedback.validation.required',
   duplicated: 'feedback.validation.duplicated',
-  incorrecredUrl: 'feedback.validation.incorrecredUrl',
+  incorrectUrl: 'feedback.validation.incorrectUrl',
   fail: 'feedback.processStates.fail',
   success: 'feedback.processStates.success',
-  network: 'feedback.network',
 }
 
 yup.setLocale({
@@ -17,7 +16,7 @@ yup.setLocale({
     notOneOf: () => feedbackInners.duplicated,
   },
   string: {
-    url: () => feedbackInners.incorrecredUrl,
+    url: () => feedbackInners.incorrectUrl,
   },
 })
 
@@ -28,13 +27,18 @@ const initSchema = urls =>
 
 const routes = url => `https://allorigins.hexlet.app/get?disableCache=true&url=${url}`
 
-const parseXMLString = (str) => {
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(str, 'application/xml')
-  // commit 'change logic with feedback element' ??
+const parseXMLStringToDoc = str => new DOMParser().parseFromString(str, 'application/xml')
+
+const validateRSS = (str) => {
+  const doc = parseXMLStringToDoc(str)
+
   const isErrorFormat = doc.querySelector('parsererror')
   const isRSSFormat = doc.querySelector('rss')
   if (isErrorFormat && !isRSSFormat) throw new Error(feedbackInners.fail)
+}
+
+const createFeedObject = (str) => {
+  const doc = parseXMLStringToDoc(str)
 
   const feedId = uniqueId()
   const data = {
@@ -55,6 +59,37 @@ const parseXMLString = (str) => {
     link: post.querySelector('link').textContent,
   }))
   return data
+}
+
+const updatePosts = (watchedState) => {
+  const links = watchedState.fields.posts.map(({ link }) => link)
+  const rssLinks = watchedState.form.urls.map(url => routes(url))
+  console.log('rssLinks', rssLinks)
+
+  setTimeout(() => {
+    const promises = rssLinks.map(rssLink =>
+      axios
+        .get(rssLink)
+        .then(response => createFeedObject(response.data.contents))
+        .catch((error) => {
+          console.log(error.message)
+          return null
+        }),
+    )
+    Promise.all(promises)
+      .then((objects) => {
+        const correctObjects = objects.filter(Boolean)
+        correctObjects.forEach((obj) => {
+          const newPosts = obj.posts.filter(({ link }) => !links.includes(link))
+          console.log('newPosts', newPosts)
+          watchedState.fields.posts = [...newPosts, ...watchedState.fields.posts]
+        })
+      })
+      .catch()
+      .finally(() => {
+        updatePosts(watchedState)
+      })
+  }, 5000)
 }
 
 export default (watchedState, elements) => {
@@ -78,16 +113,19 @@ export default (watchedState, elements) => {
       })
       .then((response) => {
         const xmlString = response.data.contents
-        const parsingData = parseXMLString(xmlString)
-
+        validateRSS(xmlString)
         watchedState.processStatus = 'success'
         watchedState.feedback = feedbackInners.success
         urls.push(newUrl.url)
-        watchedState.fields.feeds.push(parsingData.feed)
-        watchedState.fields.posts = [...parsingData.posts, ...watchedState.fields.posts] // корректно ли??
+
+        const obj = createFeedObject(xmlString)
+        watchedState.fields.feeds.push(obj.feed)
+        watchedState.fields.posts = [...obj.posts, ...watchedState.fields.posts] // корректно ли??
+
+        if (urls.length === 1) updatePosts(watchedState)
       })
       .catch((error) => {
-        watchedState.feedback = error.message === 'Network Error' ? feedbackInners.network : error.message
+        watchedState.feedback = error.message
         watchedState.processStatus = 'fail'
       })
   })
