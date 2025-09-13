@@ -1,10 +1,9 @@
-// import i18next from 'i18next'
 import onChange from 'on-change'
 
-const fillTextFields = (i18n, fields) => {
-  const fieldsNames = Object.keys(fields)
-  fieldsNames.forEach((fieldName) => {
-    fields[fieldName].textContent = i18n.t(`appItems.${fieldName}`)
+const fillStaticElements = (i18n, items) => {
+  const names = Object.keys(items)
+  names.forEach((itemName) => {
+    items[itemName].textContent = i18n.t(`staticAppItems.${itemName}`)
   })
 }
 
@@ -65,11 +64,13 @@ const renderFeeds = (elements, feeds, i18n) => {
   feedsElement.append(feedsContainer)
 }
 
-const setVisitedPost = (id) => {
-  console.log('visit')
-  const visitedPost = document.querySelector(`a[data-id="${id}"]`)
-  visitedPost.classList.remove('fw-bold')
-  visitedPost.classList.add('fw-normal', 'text-secondary')
+const setVisitedPosts = (watchedState) => {
+  const { visitedPosts } = watchedState.uiState
+  visitedPosts.forEach((postId) => {
+    const visitedPost = document.querySelector(`a[data-id="${postId}"]`)
+    visitedPost.classList.remove('fw-bold')
+    visitedPost.classList.add('fw-normal', 'text-secondary')
+  })
 }
 
 const renderPosts = (watchedState, elements, posts, i18n) => {
@@ -111,11 +112,7 @@ const renderPosts = (watchedState, elements, posts, i18n) => {
     postButton.textContent = i18n.t('fields.posts.button')
 
     postLink.addEventListener('click', () => {
-      watchedState.visitedPost = id
-    })
-
-    postButton.addEventListener('click', () => {
-      // modal state
+      watchedState.uiState.visitedPosts.push(Number(id)) // MVC ?
     })
 
     postItem.append(postLink, postButton)
@@ -123,14 +120,28 @@ const renderPosts = (watchedState, elements, posts, i18n) => {
   })
   postsContainer.append(postsBody, postsList)
   postsElement.append(postsContainer)
+  setVisitedPosts(watchedState)
+}
+
+const fillModel = (watchedState, currentId, elements) => {
+  const [currentPost] = watchedState.fields.posts.filter(({ id }) => Number(id) === currentId)
+  const modalTitle = document.querySelector('.modal-header > h5')
+  modalTitle.textContent = currentPost.title
+  const modalBody = document.querySelector('.modal-body')
+  modalBody.innerHTML = ''
+  const modalDescription = document.createElement('p')
+  modalDescription.textContent = currentPost.description
+  modalBody.append(modalDescription)
+  const { modalLink } = elements.staticElements
+  modalLink.href = currentPost.link
 }
 
 const handleProcessStatus = (i18n, elements, value) => {
-  const { textFields, formElement, inputElement } = elements
-  const { submitButton } = textFields
+  const { staticElements, formElement, inputElement } = elements
+  const { submitButton } = staticElements
   switch (value) {
     case 'default':
-      fillTextFields(i18n, textFields)
+      fillStaticElements(i18n, staticElements)
       break
     case 'sending':
       submitButton.disabled = true // ??
@@ -167,8 +178,11 @@ export default (state, i18n, elements) => {
       case 'fields.posts':
         renderPosts(watchedState, elements, value, i18n)
         break
-      case 'visitedPost':
-        setVisitedPost(value)
+      case 'uiState.visitedPosts':
+        setVisitedPosts(watchedState)
+        break
+      case 'uiState.activePost':
+        fillModel(watchedState, value, elements)
         break
       default:
         break

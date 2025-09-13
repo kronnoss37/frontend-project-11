@@ -11,12 +11,15 @@ export default () => {
     feedbackElement: document.querySelector('#feedback'),
     feedsElement: document.querySelector('#feeds'),
     postsElement: document.querySelector('#posts'),
-    textFields: {
+    modalElement: document.querySelector('#modal'),
+    staticElements: {
       title: document.querySelector('#rss-title'),
       description: document.querySelector('#rss-description'),
       example: document.querySelector('#rss-example'),
       submitButton: document.querySelector('#rss-submit'),
       label: document.querySelector('label[for="url-input"]'),
+      modalLink: document.querySelector('#modal-link'),
+      modalClose: document.querySelector('#modal-close'),
     },
   }
 

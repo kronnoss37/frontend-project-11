@@ -10,7 +10,11 @@ export default () => {
       feeds: [],
       posts: [],
     },
-    visitedPost: null,
+    uiState: {
+      // visitedPost: null,
+      visitedPosts: [],
+      activePost: null,
+    },
     processStatus: '', // 'default', 'sending', 'fail', 'success'
     feedback: null,
   }

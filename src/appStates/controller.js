@@ -1,6 +1,7 @@
 import * as yup from 'yup'
 import axios from 'axios'
 import uniqueId from 'lodash.uniqueid'
+import 'bootstrap/js/dist/modal'
 
 const feedbackInners = {
   required: 'feedback.validation.required',
@@ -93,7 +94,7 @@ const updatePosts = (watchedState) => {
 }
 
 export default (watchedState, elements) => {
-  const { formElement } = elements
+  const { formElement, modalElement } = elements
   watchedState.processStatus = 'default'
 
   formElement.addEventListener('submit', (event) => {
@@ -129,4 +130,15 @@ export default (watchedState, elements) => {
         watchedState.processStatus = 'fail'
       })
   })
+
+  if (modalElement) {
+    modalElement.addEventListener('show.bs.modal', (event) => {
+      const button = event.relatedTarget
+      const currentId = Number(button.dataset.id)
+      watchedState.uiState.activePost = currentId
+
+      if (watchedState.uiState.visitedPosts.includes(currentId)) return // [...].includes ?
+      watchedState.uiState.visitedPosts.push(currentId)
+    })
+  }
 }
