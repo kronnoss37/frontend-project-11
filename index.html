@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru" role="document">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -12,13 +12,13 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title"></h5>
+            <h5 class="modal-title" aria-label="Modal title"></h5>
             <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body text-break">
           </div>
           <div class="modal-footer">
-            <a id="modal-link" class="btn btn-primary" href="#" target="_blank" rel="noopener noreferrer"></a>
+            <a id="modal-link" class="btn btn-primary" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open link"></a>
             <button id="modal-close" type="button" class="btn btn-secondary" data-bs-dismiss="modal"></button>
           </div>
         </div>
@@ -28,7 +28,7 @@
       <section class="container-fluid p-5 bg-dark">
         <div class="row">
           <div class="col-md-10 col-lg-8 mx-auto text-white">
-            <h1 id="rss-title" class="display-3 mb-0"></h1>
+            <h1 id="rss-title" class="display-3 mb-0" aria-label="RSS Aggregator title"></h1>
             <p id="rss-description" class="lead"></p>
             <form action id="rss-form" class="rss-form text-body">
               <div class="row">
