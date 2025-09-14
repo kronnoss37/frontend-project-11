@@ -117,7 +117,7 @@ const renderPosts = (watchedState, i18n, elements, posts) => {
   })
   postsList.addEventListener('click', (event) => {
     const element = event.target
-    if (!element.tagName === 'A') return
+    if (element.tagName !== 'A') return
     const id = element.dataset.id
     watchedState.uiState.visitedPosts.push(Number(id))
   })
