@@ -20,14 +20,15 @@ export default {
     },
     feedback: {
       validation: {
-        required: 'Данное поле являестя обязательным...',
-        duplicated: 'Введенный RSS-адрес уже существует...',
-        incorrectUrl: 'Введенный RSS-адрес должен быть валидным Url...',
+        required: 'Не должно быть пустым',
+        duplicated: 'RSS уже существует',
+        incorrectUrl: 'Ссылка должна быть валидным URL',
       },
       processStates: {
-        success: 'RSS успешно загружен!',
-        fail: 'Ресурс не содержит валидный RSS...',
+        success: 'RSS успешно загружен',
+        fail: 'Ресурс не содержит валидный RSS',
       },
+      network: 'Ошибка сети',
     },
   },
 }
