@@ -7,5 +7,18 @@
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=kronnoss37_frontend-project-11&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=kronnoss37_frontend-project-11)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=kronnoss37_frontend-project-11&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=kronnoss37_frontend-project-11)
 
-### RSS aggregator app
+### RSS агрегатор / RSS Reader
 https://frontend-project-11-gules-nine.vercel.app/
+
+## See how to install the project.
+
+```bash
+# Clone the repository
+git clone https://github.com/kronnoss37/frontend-project-11.git
+
+# Navigate to the project directory
+cd frontend-project-11
+
+# Install dependencies for the program to work correctly
+make install
+```
