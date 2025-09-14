@@ -9,6 +9,7 @@ const feedbackInners = {
   incorrectUrl: 'feedback.validation.incorrectUrl',
   fail: 'feedback.processStates.fail',
   success: 'feedback.processStates.success',
+  network: 'feedback.network',
 }
 
 yup.setLocale({
@@ -30,15 +31,14 @@ const routes = url => `https://allorigins.hexlet.app/get?disableCache=true&url=$
 
 const parseXMLStringToDoc = str => new DOMParser().parseFromString(str, 'application/xml')
 
-const validateRSS = (str) => {
+const validateRssFormat = (str) => {
   const doc = parseXMLStringToDoc(str)
-
   const isErrorFormat = doc.querySelector('parsererror')
   const isRSSFormat = doc.querySelector('rss')
   if (isErrorFormat && !isRSSFormat) throw new Error(feedbackInners.fail)
 }
 
-const createFeedObject = (str) => {
+const parseFeedAndPosts = (str) => {
   const doc = parseXMLStringToDoc(str)
 
   const feedId = uniqueId()
@@ -63,17 +63,16 @@ const createFeedObject = (str) => {
 }
 
 const updatePosts = (watchedState) => {
-  const links = watchedState.fields.posts.map(({ link }) => link)
+  const links = watchedState.data.posts.map(({ link }) => link)
   const rssLinks = watchedState.form.urls.map(url => routes(url))
-  console.log('rssLinks', rssLinks)
 
   setTimeout(() => {
     const promises = rssLinks.map(rssLink =>
       axios
         .get(rssLink)
-        .then(response => createFeedObject(response.data.contents))
+        .then(response => parseFeedAndPosts(response.data.contents))
         .catch((error) => {
-          console.log(error.message)
+          console.error(error.message)
           return null
         }),
     )
@@ -82,11 +81,12 @@ const updatePosts = (watchedState) => {
         const correctObjects = objects.filter(Boolean)
         correctObjects.forEach((obj) => {
           const newPosts = obj.posts.filter(({ link }) => !links.includes(link))
-          console.log('newPosts', newPosts)
-          watchedState.fields.posts = [...newPosts, ...watchedState.fields.posts]
+          watchedState.data.posts = [...newPosts, ...watchedState.data.posts]
         })
       })
-      .catch()
+      .catch((error) => {
+        console.error(error.message)
+      })
       .finally(() => {
         updatePosts(watchedState)
       })
@@ -107,38 +107,38 @@ export default (watchedState, elements) => {
     schema
       .validate(newUrl)
       .then(() => {
-        // watchedState.feedback = '' // ??
         const rightUrl = routes(newUrl.url)
         watchedState.processStatus = 'sending'
         return axios.get(rightUrl)
       })
       .then((response) => {
         const xmlString = response.data.contents
-        validateRSS(xmlString)
+        validateRssFormat(xmlString)
+        watchedState.uiState.feedback = feedbackInners.success
         watchedState.processStatus = 'success'
-        watchedState.feedback = feedbackInners.success
         urls.push(newUrl.url)
 
-        const obj = createFeedObject(xmlString)
-        watchedState.fields.feeds.push(obj.feed)
-        watchedState.fields.posts = [...obj.posts, ...watchedState.fields.posts] // корректно ли??
+        const obj = parseFeedAndPosts(xmlString)
+        watchedState.data.feeds.push(obj.feed)
+        watchedState.data.posts = [...obj.posts, ...watchedState.data.posts]
 
         if (urls.length === 1) updatePosts(watchedState)
       })
       .catch((error) => {
-        watchedState.feedback = error.message
+        watchedState.uiState.feedback = error.code === 'ERR_NETWORK' ? feedbackInners.network : error.message
         watchedState.processStatus = 'fail'
       })
   })
 
   if (modalElement) {
     modalElement.addEventListener('show.bs.modal', (event) => {
+      const { visitedPosts } = watchedState.uiState
       const button = event.relatedTarget
       const currentId = Number(button.dataset.id)
       watchedState.uiState.activePost = currentId
 
-      if (watchedState.uiState.visitedPosts.includes(currentId)) return // [...].includes ?
-      watchedState.uiState.visitedPosts.push(currentId)
+      if (visitedPosts.includes(currentId)) return
+      visitedPosts.push(currentId)
     })
   }
 }

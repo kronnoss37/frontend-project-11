@@ -1,38 +1,48 @@
 import onChange from 'on-change'
 
-const fillStaticElements = (i18n, items) => {
-  const names = Object.keys(items)
-  names.forEach((itemName) => {
-    items[itemName].textContent = i18n.t(`staticAppItems.${itemName}`)
-  })
-}
-
-const handleFeedback = (elements, path, i18n) => {
-  const { feedbackElement } = elements
-  feedbackElement.textContent = i18n.t(path)
-}
-
-const handleFailState = (elements) => {
-  const { inputElement, feedbackElement } = elements
-  inputElement.classList.add('is-invalid')
-  feedbackElement.classList.add('text-danger')
-  feedbackElement.classList.remove('text-success')
-}
-
-const handleSuccessState = (elements) => {
-  const { inputElement, feedbackElement } = elements
-  inputElement.classList.remove('is-invalid')
-  feedbackElement.classList.remove('text-danger')
-  feedbackElement.classList.add('text-success')
-}
-
 const setAttributes = (el, attrs) => {
   Object.keys(attrs).forEach((attr) => {
     el.setAttribute(attr, attrs[attr])
   })
 }
 
-const renderFeeds = (elements, feeds, i18n) => {
+const updateStaticElements = (i18n, items) => {
+  const names = Object.keys(items)
+  names.forEach((itemName) => {
+    items[itemName].textContent = i18n.t(`staticAppItems.${itemName}`)
+  })
+}
+
+const updateFeedback = (i18n, elements, path) => {
+  const { feedbackElement } = elements
+  console.log('path', path)
+  feedbackElement.textContent = i18n.t(path)
+}
+
+const updateVisitedPosts = (watchedState) => {
+  const { visitedPosts } = watchedState.uiState
+  visitedPosts.forEach((postId) => {
+    const visitedPost = document.querySelector(`a[data-id="${postId}"]`)
+    visitedPost.classList.remove('fw-bold')
+    visitedPost.classList.add('fw-normal', 'text-secondary')
+  })
+}
+
+const updateModal = (watchedState, elements, currentId) => {
+  const [currentPost] = watchedState.data.posts.filter(({ id }) => Number(id) === currentId)
+  if (!currentPost) return
+  const modalTitle = document.querySelector('.modal-header > h5')
+  modalTitle.textContent = currentPost.title
+  const modalBody = document.querySelector('.modal-body')
+  modalBody.innerHTML = ''
+  const modalDescription = document.createElement('p')
+  modalDescription.textContent = currentPost.description
+  modalBody.append(modalDescription)
+  const { modalLink } = elements.staticElements
+  modalLink.href = currentPost.link
+}
+
+const renderFeeds = (i18n, elements, feeds) => {
   const { feedsElement } = elements
   feedsElement.innerHTML = ''
   const feedsContainer = document.createElement('div')
@@ -64,16 +74,7 @@ const renderFeeds = (elements, feeds, i18n) => {
   feedsElement.append(feedsContainer)
 }
 
-const setVisitedPosts = (watchedState) => {
-  const { visitedPosts } = watchedState.uiState
-  visitedPosts.forEach((postId) => {
-    const visitedPost = document.querySelector(`a[data-id="${postId}"]`)
-    visitedPost.classList.remove('fw-bold')
-    visitedPost.classList.add('fw-normal', 'text-secondary')
-  })
-}
-
-const renderPosts = (watchedState, elements, posts, i18n) => {
+const renderPosts = (watchedState, i18n, elements, posts) => {
   const { postsElement } = elements
   postsElement.innerHTML = ''
   const postsContainer = document.createElement('div')
@@ -111,29 +112,32 @@ const renderPosts = (watchedState, elements, posts, i18n) => {
     })
     postButton.textContent = i18n.t('fields.posts.button')
 
-    postLink.addEventListener('click', () => {
-      watchedState.uiState.visitedPosts.push(Number(id)) // MVC ?
-    })
-
     postItem.append(postLink, postButton)
     postsList.append(postItem)
   })
+  postsList.addEventListener('click', (event) => {
+    const element = event.target
+    if (!element.tagName === 'A') return
+    const id = element.dataset.id
+    watchedState.uiState.visitedPosts.push(Number(id))
+  })
   postsContainer.append(postsBody, postsList)
   postsElement.append(postsContainer)
-  setVisitedPosts(watchedState)
+  updateVisitedPosts(watchedState)
 }
 
-const fillModel = (watchedState, currentId, elements) => {
-  const [currentPost] = watchedState.fields.posts.filter(({ id }) => Number(id) === currentId)
-  const modalTitle = document.querySelector('.modal-header > h5')
-  modalTitle.textContent = currentPost.title
-  const modalBody = document.querySelector('.modal-body')
-  modalBody.innerHTML = ''
-  const modalDescription = document.createElement('p')
-  modalDescription.textContent = currentPost.description
-  modalBody.append(modalDescription)
-  const { modalLink } = elements.staticElements
-  modalLink.href = currentPost.link
+const handleFailState = (elements) => {
+  const { inputElement, feedbackElement } = elements
+  inputElement.classList.add('is-invalid')
+  feedbackElement.classList.add('text-danger')
+  feedbackElement.classList.remove('text-success')
+}
+
+const handleSuccessState = (elements) => {
+  const { inputElement, feedbackElement } = elements
+  inputElement.classList.remove('is-invalid')
+  feedbackElement.classList.remove('text-danger')
+  feedbackElement.classList.add('text-success')
 }
 
 const handleProcessStatus = (i18n, elements, value) => {
@@ -141,10 +145,10 @@ const handleProcessStatus = (i18n, elements, value) => {
   const { submitButton } = staticElements
   switch (value) {
     case 'default':
-      fillStaticElements(i18n, staticElements)
+      updateStaticElements(i18n, staticElements)
       break
     case 'sending':
-      submitButton.disabled = true // ??
+      submitButton.disabled = true
       break
     case 'fail':
       submitButton.disabled = false
@@ -162,27 +166,25 @@ const handleProcessStatus = (i18n, elements, value) => {
 }
 
 export default (state, i18n, elements) => {
-  //
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
       case 'processStatus':
         handleProcessStatus(i18n, elements, value)
-        console.log('status', value)
         break
-      case 'feedback':
-        handleFeedback(elements, value, i18n)
+      case 'data.feeds':
+        renderFeeds(i18n, elements, value)
         break
-      case 'fields.feeds':
-        renderFeeds(elements, value, i18n)
+      case 'data.posts':
+        renderPosts(watchedState, i18n, elements, value)
         break
-      case 'fields.posts':
-        renderPosts(watchedState, elements, value, i18n)
+      case 'uiState.feedback':
+        updateFeedback(i18n, elements, value)
         break
       case 'uiState.visitedPosts':
-        setVisitedPosts(watchedState)
+        updateVisitedPosts(watchedState)
         break
       case 'uiState.activePost':
-        fillModel(watchedState, value, elements)
+        updateModal(watchedState, elements, value)
         break
       default:
         break
