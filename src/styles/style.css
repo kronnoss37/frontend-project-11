@@ -1,9 +1,10 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-.scale-on-hover{
+/* hexlet-check fall */
+/* .scale-on-hover{
   transition: transform 0.3s ease-in-out;
 }
 
 .scale-on-hover:hover{
   transform: scale(1.1)
-} 
+}  */

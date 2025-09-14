@@ -96,7 +96,7 @@ const renderPosts = (watchedState, i18n, elements, posts) => {
     const postLink = document.createElement('a')
     setAttributes(postLink, {
       'href': `${link}`,
-      'class': 'fw-bold scale-on-hover',
+      'class': 'fw-bold',
       'target': '_blank',
       'rel': 'noopener noreferrer',
       'data-id': `${id}`,
