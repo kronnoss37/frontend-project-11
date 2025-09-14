@@ -62,34 +62,33 @@ const parseFeedAndPosts = (str) => {
   return data
 }
 
+const requestRss = rssLink =>
+  axios
+    .get(rssLink)
+    .then(response => parseFeedAndPosts(response.data.contents))
+    .catch((error) => {
+      console.error(error.message)
+      return null
+    })
+
+const mergePosts = (watchedState, objects, links) => {
+  const correctObjects = objects.filter(Boolean)
+  correctObjects.forEach((obj) => {
+    const newPosts = obj.posts.filter(({ link }) => !links.includes(link))
+    watchedState.data.posts = [...newPosts, ...watchedState.data.posts]
+  })
+}
+
 const updatePosts = (watchedState) => {
   const links = watchedState.data.posts.map(({ link }) => link)
   const rssLinks = watchedState.form.urls.map(url => routes(url))
 
   setTimeout(() => {
-    const promises = rssLinks.map(rssLink =>
-      axios
-        .get(rssLink)
-        .then(response => parseFeedAndPosts(response.data.contents))
-        .catch((error) => {
-          console.error(error.message)
-          return null
-        }),
-    )
+    const promises = rssLinks.map(requestRss)
     Promise.all(promises)
-      .then((objects) => {
-        const correctObjects = objects.filter(Boolean)
-        correctObjects.forEach((obj) => {
-          const newPosts = obj.posts.filter(({ link }) => !links.includes(link))
-          watchedState.data.posts = [...newPosts, ...watchedState.data.posts]
-        })
-      })
-      .catch((error) => {
-        console.error(error.message)
-      })
-      .finally(() => {
-        updatePosts(watchedState)
-      })
+      .then(objects => mergePosts(watchedState, objects, links))
+      .catch(error => console.error(error.message))
+      .finally(() => updatePosts(watchedState))
   }, 5000)
 }
 
