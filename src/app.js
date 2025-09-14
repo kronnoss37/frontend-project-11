@@ -23,6 +23,7 @@ export default () => {
     },
   }
 
+  // init app
   const state = initModel()
   const defaultLanguage = 'ru'
 
@@ -33,9 +34,10 @@ export default () => {
       resources,
     })
     .then(() => {
-      // use i18n
       const watchedState = initView(state, i18n, elements)
       bindController(watchedState, elements)
     })
-    .catch()
+    .catch((error) => {
+      console.error(error)
+    })
 }
