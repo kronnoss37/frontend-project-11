@@ -1,21 +1,17 @@
-// create state
-
 export default () => {
-  // ?? something else?
   return {
     form: {
       urls: [],
     },
-    fields: {
+    data: {
       feeds: [],
       posts: [],
     },
     uiState: {
-      // visitedPost: null,
       visitedPosts: [],
       activePost: null,
+      feedback: null,
     },
     processStatus: '', // 'default', 'sending', 'fail', 'success'
-    feedback: null,
   }
 }
