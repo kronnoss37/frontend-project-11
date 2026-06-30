@@ -27,9 +27,17 @@ const initSchema = urls =>
     url: yup.string().required().url().notOneOf(urls),
   })
 
-const routes = url => `https://allorigins.hexlet.app/get?disableCache=true&url=${url}`
+const routes = url =>
+  `https://allorigins.hexlet.app/get?disableCache=true&url=${url}`
 
-const parseXMLStringToDoc = str => new DOMParser().parseFromString(str, 'application/xml')
+const changeLanguage = (watchedState, i18n, lang) => {
+  i18n.changeLanguage(lang).then(() => {
+    watchedState.currentLang = lang
+  })
+}
+
+const parseXMLStringToDoc = str =>
+  new DOMParser().parseFromString(str, 'application/xml')
 
 const validateRssFormat = (str) => {
   const doc = parseXMLStringToDoc(str)
@@ -92,9 +100,18 @@ const updatePosts = (watchedState) => {
   }, 5000)
 }
 
-export default (watchedState, elements) => {
-  const { formElement, modalElement } = elements
+export default (watchedState, i18n, elements) => {
+  const { formElement, modalElement, staticElements } = elements
+  const { englishButton, russianButton } = staticElements
   watchedState.processStatus = 'default'
+
+  englishButton.addEventListener('click', () => {
+    changeLanguage(watchedState, i18n, 'en')
+  })
+
+  russianButton.addEventListener('click', () => {
+    changeLanguage(watchedState, i18n, 'ru')
+  })
 
   formElement.addEventListener('submit', (event) => {
     event.preventDefault()
@@ -124,7 +141,8 @@ export default (watchedState, elements) => {
         if (urls.length === 1) updatePosts(watchedState)
       })
       .catch((error) => {
-        watchedState.uiState.feedback = error.code === 'ERR_NETWORK' ? feedbackInners.network : error.message
+        watchedState.uiState.feedback
+          = error.code === 'ERR_NETWORK' ? feedbackInners.network : error.message
         watchedState.processStatus = 'fail'
       })
   })

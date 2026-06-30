@@ -1,2 +1,3 @@
 import ru from './ru.js'
-export default { ru }
+import en from './en.js'
+export default { ru, en }

@@ -8,6 +8,8 @@ export default {
       example: 'Пример: https://lorem-rss.hexlet.app/feed',
       modalLink: 'Читать полностью',
       modalClose: 'Закрыть',
+      englishButton: 'En',
+      russianButton: 'Ru',
     },
     fields: {
       feeds: {

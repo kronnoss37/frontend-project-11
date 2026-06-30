@@ -20,12 +20,15 @@ export default () => {
       label: document.querySelector('label[for="url-input"]'),
       modalLink: document.querySelector('#modal-link'),
       modalClose: document.querySelector('#modal-close'),
+      englishButton: document.querySelector('#en-button'),
+      russianButton: document.querySelector('#ru-button'),
     },
   }
 
   // init app
   const state = initModel()
-  const defaultLanguage = 'ru'
+  // const defaultLanguage = 'ru'
+  const defaultLanguage = state.currentLang
 
   const i18n = i18next.createInstance()
   i18n
@@ -35,7 +38,7 @@ export default () => {
     })
     .then(() => {
       const watchedState = initView(state, i18n, elements)
-      bindController(watchedState, elements)
+      bindController(watchedState, i18n, elements)
     })
     .catch((error) => {
       console.error(error)

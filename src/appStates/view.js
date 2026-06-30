@@ -13,9 +13,17 @@ const updateStaticElements = (i18n, items) => {
   })
 }
 
+const getClassNameForLangButton = (currentLang, lang) =>
+  currentLang === lang ? 'btn btn-primary active' : 'btn btn-outline-primary'
+
+const updateLangButtons = (items, currentLang) => {
+  const { englishButton, russianButton } = items
+  englishButton.className = getClassNameForLangButton(currentLang, 'en')
+  russianButton.className = getClassNameForLangButton(currentLang, 'ru')
+}
+
 const updateFeedback = (i18n, elements, path) => {
   const { feedbackElement } = elements
-  console.log('path', path)
   feedbackElement.textContent = i18n.t(path)
 }
 
@@ -29,7 +37,9 @@ const updateVisitedPosts = (watchedState) => {
 }
 
 const updateModal = (watchedState, elements, currentId) => {
-  const [currentPost] = watchedState.data.posts.filter(({ id }) => Number(id) === currentId)
+  const [currentPost] = watchedState.data.posts.filter(
+    ({ id }) => Number(id) === currentId,
+  )
   if (!currentPost) return
   const modalTitle = document.querySelector('.modal-header > h5')
   modalTitle.textContent = currentPost.title
@@ -92,7 +102,14 @@ const renderPosts = (watchedState, i18n, elements, posts) => {
   posts.forEach((post) => {
     const { id, title, link } = post
     const postItem = document.createElement('li')
-    postItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center', 'border-0')
+    postItem.classList.add(
+      'list-group-item',
+      'd-flex',
+      'justify-content-between',
+      'align-items-center',
+      'gap-2',
+      'border-0',
+    )
     const postLink = document.createElement('a')
     setAttributes(postLink, {
       'href': `${link}`,
@@ -185,6 +202,19 @@ export default (state, i18n, elements) => {
         break
       case 'uiState.activePost':
         updateModal(watchedState, elements, value)
+        break
+      case 'currentLang':
+        updateStaticElements(i18n, elements.staticElements)
+        updateLangButtons(elements.staticElements, value)
+        if (watchedState.data.feeds.length > 0) {
+          renderFeeds(i18n, elements, watchedState.data.feeds)
+        }
+        if (watchedState.data.posts.length > 0) {
+          renderPosts(watchedState, i18n, elements, watchedState.data.posts)
+        }
+        if (watchedState.uiState.feedback) {
+          updateFeedback(i18n, elements, watchedState.uiState.feedback)
+        }
         break
       default:
         break

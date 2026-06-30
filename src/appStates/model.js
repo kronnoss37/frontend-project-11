@@ -13,5 +13,6 @@ export default () => {
       feedback: null,
     },
     processStatus: '', // 'default', 'sending', 'fail', 'success'
+    currentLang: 'ru', // 'ru', 'en'
   }
 }
