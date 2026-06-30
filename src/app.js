@@ -27,7 +27,6 @@ export default () => {
 
   // init app
   const state = initModel()
-  // const defaultLanguage = 'ru'
   const defaultLanguage = state.currentLang
 
   const i18n = i18next.createInstance()
