@@ -69,7 +69,3 @@ make run
 # Build the project
 make build
 ```
-
-## 👤 Автор
-
-#### Kirill — Frontend Developer
